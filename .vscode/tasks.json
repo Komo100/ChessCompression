@@ -10,7 +10,7 @@
                 "${file}",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe",
-                //"${fileDirname}\\Huffman.cpp"                
+                "${fileDirname}\\Huffman.cpp"                
             ],
             "options": {
                 "cwd": "${fileDirname}"

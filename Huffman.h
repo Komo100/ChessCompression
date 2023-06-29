@@ -3,9 +3,10 @@
 
 #include <string>
 #include <iostream>
-#include <bitset>
 #include <map>
+#include <vector>
+#include <algorithm>
 
-std::map<std::string, std::bitset<8>> Huffman(std::map<int, std::string> Symbols);
+std::map<std::string, std::string> Huffman(std::map<std::string, int> Symbols);
     
 #endif
