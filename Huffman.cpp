@@ -21,8 +21,35 @@ struct node {
     node() {};
 };
 
+struct node_list {
+
+    node* Nodes;
+    int append_index;
+
+    void append(node a) {
+        Nodes[append_index] = a;
+        append_index += 1;
+    }
+    node GetLast() {       
+        return Nodes[append_index - 1];
+    }
+    node* GetLastPointer() {
+        node* pointer = &Nodes[append_index - 1];
+        return pointer;
+    }
+    node_list(int size) {
+        append_index = 0;
+        Nodes = new node[size];
+        node empty = node("", 0);
+        for(int i = 0; i < size; i++) {
+            Nodes[i] = empty;
+        }    
+    }
+};
+
 std::map<std::string, std::string> Huffman(std::map<std::string, int> Symbols) {
 
+    int list_size = 2*Symbols.size() - 1;
     std::vector<node> Queue;
     std::map<std::string, int>::iterator it;
     std::map<std::string, int> Buff = Symbols;
@@ -42,18 +69,17 @@ std::map<std::string, std::string> Huffman(std::map<std::string, int> Symbols) {
 
     reverse(Queue.begin(), Queue.end());
 
-    node* Nodes = new node[Queue.size()*Queue.size()]; 
-    int Nodes_counter = 0;
+    node_list Nodes = node_list(list_size);
+
     while(!Queue.empty()) {
         Queue.at(0).code = '0';
         Queue.at(1).code = '1';
         node a = node(Queue.at(0).symbol + Queue.at(1).symbol, 
                       Queue.at(0).frequency + Queue.at(1).frequency);
-
-        Nodes[Nodes_counter] = Queue.at(0); a.left = &Nodes[Nodes_counter];
-        Nodes_counter ++;
-        Nodes[Nodes_counter] = Queue.at(1); a.right = &Nodes[Nodes_counter];
-        Nodes_counter ++;
+        Nodes.append(Queue.at(0)); 
+        a.left = Nodes.GetLastPointer();
+        Nodes.append(Queue.at(1));
+        a.right = Nodes.GetLastPointer();
         Queue.erase(Queue.begin(), Queue.begin() + 2);
         for(int i = 0; i < Queue.size(); i++) {
 
@@ -67,17 +93,15 @@ std::map<std::string, std::string> Huffman(std::map<std::string, int> Symbols) {
             }
         }
         if(Queue.size() == 0) {
-            Nodes[Nodes_counter] = a;
-            Nodes_counter++;
+            Nodes.append(a);
             break;
         }
     }
 
     std::map<std::string, std::string> ReturnMap;
     for(it = Symbols.begin(); it != Symbols.end(); it++) {
-        node a = Nodes[Nodes_counter - 1];
+        node a = Nodes.GetLast();
         std::string code = "";
-        int i = 0;
         while(a.left != NULL) {
             if(a.left->symbol.find(it->first) != std::string::npos) {
                 code += a.left->code;
@@ -87,11 +111,10 @@ std::map<std::string, std::string> Huffman(std::map<std::string, int> Symbols) {
                 code += a.right->code;
                 a = *a.right;
             }
-            i++;
         }
         ReturnMap[it->first] = code;
     }
-    delete[] Nodes;
+    delete[] Nodes.Nodes;
 
     return ReturnMap;
 }
